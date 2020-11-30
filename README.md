@@ -5,7 +5,7 @@ Binaries for the hey load generator tool
 
 There has been a history of issues with the release binary for hey, and currently there is no update upstream on when that will be resolved.
 
-The latest issue is:
+The latest issue is: [229](https://github.com/rakyll/hey/issues/229), but there were also issues when the download moved to GCS initially, from GitHub releases.
 
 ## Goals
 
