@@ -42,10 +42,20 @@ jobs:
           prerelease: false
       -
         name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v2
+        uses: alexellis/upload-assets@0.2.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: bin/hey*
-          tag: ${{ github.event.inputs.tag }}
-          overwrite: true
-          file_glob: true
+          asset_paths: '["./bin/hey*"]'
+
+
+
+
+
+        # uses: svenstaro/upload-release-action@v2
+        # with:
+        #   repo_token: ${{ secrets.GITHUB_TOKEN }}
+        #   file: bin/hey*
+        #   tag: ${{ github.event.inputs.tag }}
+        #   overwrite: true
+        #   file_glob: true
