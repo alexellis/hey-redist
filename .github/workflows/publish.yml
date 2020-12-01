@@ -1,0 +1,61 @@
+name: publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Version to Checkout and Release'
+        required: true
+        default: 'v0.1.2'
+
+jobs:
+  publish:
+    strategy:
+      matrix:
+        go-version: [1.13.x]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      -
+        uses: actions/checkout@master
+        with:
+          repository: rakyll/hey
+          ref: ${{ github.event.inputs.tag }}
+          fetch-depth: 1
+      -
+        name: Generate Binaries
+        run: |
+          CGO_ENABLED=0 GOOS=linux go build -mod=readonly -o bin/hey && \
+          CGO_ENABLED=0 GOOS=darwin go build -mod=readonly -o bin/hey-darwin && \
+          CGO_ENABLED=0 GOOS=windows go build -mod=readonly -o bin/hey-windows.exe && \
+          CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=6 go build -mod=readonly -o bin/hey-armhf && \
+          CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -mod=readonly -o bin/hey-arm64
+      -
+        name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.event.inputs.tag }}
+          draft: false
+          prerelease: false
+      -
+        name: Upload binaries to release
+        uses: alexellis/upload-assets@0.2.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          asset_paths: '["./bin/hey*"]'
+
+
+
+
+
+        # uses: svenstaro/upload-release-action@v2
+        # with:
+        #   repo_token: ${{ secrets.GITHUB_TOKEN }}
+        #   file: bin/hey*
+        #   tag: ${{ github.event.inputs.tag }}
+        #   overwrite: true
+        #   file_glob: true
